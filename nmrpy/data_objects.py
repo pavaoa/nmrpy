@@ -36,7 +36,7 @@ class Base():
             self.__id = id
         else:
             raise AttributeError('ID must be a string or None.')
-        
+
     @property
     def fid_path(self):
         return self.__fid_path
@@ -90,9 +90,9 @@ class Base():
     @_procpar.setter
     def _procpar(self, procpar):
         if procpar is None:
-            self.__procpar = procpar 
+            self.__procpar = procpar
         elif isinstance(procpar, dict):
-            self.__procpar = procpar 
+            self.__procpar = procpar
             self._params = self._extract_procpar(procpar)
         else:
             raise AttributeError('procpar must be a dictionary or None.')
@@ -115,7 +115,7 @@ class Base():
         elif self._file_format == 'varian':
             return self._extract_procpar_varian(procpar)
         #else:
-        #    raise AttributeError('Could not parse procpar.') 
+        #    raise AttributeError('Could not parse procpar.')
 
     @staticmethod
     def _extract_procpar_varian(procpar):
@@ -159,7 +159,7 @@ class Base():
         return params
 
     @staticmethod
-    def _extract_procpar_bruker(procpar): 
+    def _extract_procpar_bruker(procpar):
         """
         Extract some commonly-used NMR parameters (using Bruker denotations)
         and return a parameter dictionary 'params'.
@@ -206,7 +206,7 @@ class Fid(Base):
     '''
     The basic FID (Free Induction Decay) class contains all the data for a single spectrum (:attr:`~nmrpy.data_objects.Fid.data`), and the
     necessary methods to process these data.
-    '''    
+    '''
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -228,8 +228,8 @@ class Fid(Base):
         The spectral data. This is the primary object upon which the processing and analysis functions work.
         """
         return self.__data
-    
-    @data.setter    
+
+    @data.setter
     def data(self, data):
         if Fid._is_valid_dataset(data):
             self.__data = numpy.array(data)
@@ -250,8 +250,8 @@ class Fid(Base):
         Picked peaks for deconvolution of :attr:`~nmrpy.data_objects.Fid.data`.
         """
         return self._peaks
-    
-    @peaks.setter    
+
+    @peaks.setter
     def peaks(self, peaks):
         if peaks is not None:
             if not Fid._is_flat_iter(peaks):
@@ -268,8 +268,8 @@ class Fid(Base):
         Picked ranges for deconvolution of :attr:`~nmrpy.data_objects.Fid.data`.
         """
         return self._ranges
-    
-    @ranges.setter    
+
+    @ranges.setter
     def ranges(self, ranges):
         if ranges is None:
             self._ranges = None
@@ -287,8 +287,8 @@ class Fid(Base):
     @property
     def _bl_ppm(self):
         return self.__bl_ppm
-    
-    @_bl_ppm.setter    
+
+    @_bl_ppm.setter
     def _bl_ppm(self, bl_ppm):
         if bl_ppm is not None:
             if not Fid._is_flat_iter(bl_ppm):
@@ -312,8 +312,8 @@ class Fid(Base):
     @property
     def _bl_poly(self):
         return self.__bl_poly
-    
-    @_bl_poly.setter    
+
+    @_bl_poly.setter
     def _bl_poly(self, bl_poly):
         if bl_poly is not None:
             if not Fid._is_flat_iter(bl_poly):
@@ -332,7 +332,7 @@ class Fid(Base):
         if self.peaks is not None:
             return self._conv_to_index(self.data, self.peaks, self._params['sw_left'], self._params['sw'])
         else:
-            return [] 
+            return []
 
     @property
     def _index_ranges(self):
@@ -344,7 +344,7 @@ class Fid(Base):
             index_ranges = self._conv_to_index(self.data, self.ranges.flatten(), self._params['sw_left'], self._params['sw'])
             return index_ranges.reshape(shp)
         else:
-            return [] 
+            return []
 
     @property
     def _grouped_peaklist(self):
@@ -385,7 +385,7 @@ class Fid(Base):
 
             frac_gauss: fraction of peak to be Gaussian (Lorentzian fraction is 1-frac_gauss)
          """
-        self.__deconvoluted_peaks = deconvoluted_peaks 
+        self.__deconvoluted_peaks = deconvoluted_peaks
 
     @property
     def deconvoluted_integrals(self):
@@ -399,7 +399,7 @@ class Fid(Base):
                 int_lorentz = (1-peak[-1])*Fid._f_lorentz_int(peak[3], peak[2])
                 integrals.append(int_gauss+int_lorentz)
             return integrals
-            
+
     def _get_plots(self):
         """
         Return a list of all :class:`~nmrpy.plotting.Plot` objects owned by this :class:`~nmrpy.data_objects.Fid`.
@@ -446,8 +446,8 @@ class Fid(Base):
             raise TypeError('Data must not be nested.')
         if not all(isinstance(i, numbers.Number) for i in data):
             raise TypeError('Data must consist of numbers only.')
-        return True 
-        
+        return True
+
 
     @classmethod
     def from_data(cls, data):
@@ -456,11 +456,11 @@ class Fid(Base):
         Instantiate a new :class:`~nmrpy.data_objects.Fid` object by providing a
         spectral data object as argument. Eg. ::
 
-            fid = Fid.from_data(data) 
+            fid = Fid.from_data(data)
         """
         new_instance = cls()
         new_instance.data = data
-        return new_instance  
+        return new_instance
 
     def zf(self):
         """
@@ -531,7 +531,7 @@ class Fid(Base):
     @staticmethod
     def _conv_to_ppm(data, index, sw_left, sw):
             """
-            Convert index array to ppm. 
+            Convert index array to ppm.
             """
             if isinstance(index, list):
                     index = numpy.array(index)
@@ -545,7 +545,7 @@ class Fid(Base):
     @staticmethod
     def _conv_to_index(data, ppm, sw_left, sw):
             """
-            Convert ppm array to index. 
+            Convert ppm array to index.
             """
             conv_to_int = False
             if not Fid._is_iter(ppm):
@@ -559,7 +559,7 @@ class Fid(Base):
             if conv_to_int:
                 return int(numpy.ceil(indices))
             return numpy.array(numpy.ceil(indices), dtype=int)
-    
+
     def phase_correct(self, method='leastsq'):
             """
 
@@ -567,7 +567,7 @@ class Fid(Base):
             total absolute area.
 
             :keyword method: The fitting method to use. Default is 'leastsq', the Levenberg-Marquardt algorithm, which is usually sufficient. Additional options include:
-                    
+
                     Nelder-Mead (nelder)
 
                     L-BFGS-B (l-bfgs-b)
@@ -605,7 +605,7 @@ class Fid(Base):
                     phased_data *= -1
             print('%d\t%d'%(mz.params['p0'].value, mz.params['p1'].value))
             return phased_data
-        
+
     @classmethod
     def _phased_data_sum(cls, pars, data):
             err = Fid._ps(data, p0=pars['p0'].value, p1=pars['p1'].value).real
@@ -615,9 +615,9 @@ class Fid(Base):
     def _ps(cls, data, p0=0.0, p1=0.0):
             """
             Linear phase correction
-            
+
             :keyword p0: Zero order phase in degrees.
-    
+
             :keyword p1: First order phase in degrees.
 
             """
@@ -635,11 +635,11 @@ class Fid(Base):
     def ps(self, p0=0.0, p1=0.0):
         """
         Linear phase correction of :attr:`~nmrpy.data_objects.Fid.data`
-        
+
         :keyword p0: Zero order phase in degrees
 
         :keyword p1: First order phase in degrees
-        
+
         """
         if not all(isinstance(i, (float, int)) for i in [p0, p1]):
             raise TypeError('p0 and p1 must be floats or ints.')
@@ -667,8 +667,8 @@ class Fid(Base):
 
     def calibrate(self):
         """
-        Instantiate a GUI widget to select a peak and calibrate spectrum. 
-        Left-clicking selects a peak. The user is then prompted to enter 
+        Instantiate a GUI widget to select a peak and calibrate spectrum.
+        Left-clicking selects a peak. The user is then prompted to enter
         the PPM value of that peak for calibration.
         """
         plot_label = \
@@ -688,7 +688,7 @@ Left - select peak
         (stored in :attr:`~nmrpy.data_objects.Fid._bl_ppm`) with polynomial of specified
         degree (stored in :attr:`~nmrpy.data_objects.Fid._bl_ppm`) and subtract this
         polynomial from :attr:`~nmrpy.data_objects.Fid.data`.
-        
+
 
         :keyword deg: degree of fitted polynomial
         """
@@ -701,7 +701,7 @@ Left - select peak
             raise TypeError('data must not be complex.')
         if not Fid._is_flat_iter(self.data):
             raise AttributeError('data must be 1 dimensional.')
-        
+
         data = self.data
         x = numpy.arange(len(data))
         m = numpy.ones_like(x)
@@ -716,7 +716,7 @@ Left - select peak
         self.data = numpy.array(data_bl)
 
     def peakpick(self, thresh=0.1):
-        """ 
+        """
 
         Attempt to automatically identify peaks. Picked peaks are assigned to
         :attr:`~nmrpy.data_objects.Fid.peaks`.
@@ -785,11 +785,11 @@ Ctrl+Alt+Right - assign
                                 title=plot_title,
                                 label=plot_label,
                                 )
-  
+
     @classmethod
     def _f_gauss(cls, offset, amplitude, gauss_sigma, x):
         return amplitude*numpy.exp(-((offset-x)**2.0)/(2.0*gauss_sigma**2.0))
-    
+
     @classmethod
     def _f_lorentz(cls, offset, amplitude, lorentz_hwhm, x):
         #return amplitude*lorentz_hwhm**2.0/(lorentz_hwhm**2.0+4.0*(offset-x)**2.0)
@@ -813,9 +813,9 @@ Ctrl+Alt+Right - assign
 
         Return the a combined Gaussian/Lorentzian peakshape for deconvolution
         of :attr:`~nmrpy.data_objects.Fid.data`.
-        
+
         :arg x: array of equal length to :attr:`~nmrpy.data_objects.Fid.data`
-        
+
 
         :keyword offset: spectral offset in x
 
@@ -828,38 +828,38 @@ Ctrl+Alt+Right - assign
         :keyword frac_gauss: fraction of function to be Gaussian (0 -> 1). Note:
             specifying a Gaussian fraction of 0 will produce a pure Lorentzian and vice
             versa.  """
-        
+
         #validation
         parameters = [offset, gauss_sigma, lorentz_hwhm, amplitude, frac_gauss]
         if not all(isinstance(i, numbers.Number) for i in parameters):
-            raise TypeError('Keyword parameters must be numbers.') 
+            raise TypeError('Keyword parameters must be numbers.')
         if not cls._is_iter(x):
-            raise TypeError('x must be an iterable') 
+            raise TypeError('x must be an iterable')
         if not isinstance(x, numpy.ndarray):
-            x = numpy.array(x) 
+            x = numpy.array(x)
         if frac_gauss > 1.0:
             frac_gauss = 1.0
         if frac_gauss < 0.0:
             frac_gauss = 0.0
-        
+
         gauss_peak = cls._f_gauss(offset, amplitude, gauss_sigma, x)
         lorentz_peak = cls._f_lorentz(offset, amplitude, lorentz_hwhm, x)
         peak = frac_gauss*gauss_peak + (1-frac_gauss)*lorentz_peak
-        
+
         return peak
-   
+
 
 
     @classmethod
     def _f_makep(cls, data, peaks, frac_gauss=None):
         """
         Make a set of initial peak parameters for deconvolution.
-        
+
 
         :arg data: data to be fitted
 
         :arg peaks: selected peak positions (see peakpicker())
-       
+
         :returns: an array of peaks, each consisting of the following parameters:
 
                     spectral offset (x)
@@ -873,12 +873,12 @@ Ctrl+Alt+Right - assign
                     frac_gauss: fraction of function to be Gaussian (0 -> 1)
         """
         if not cls._is_flat_iter(data):
-            raise TypeError('data must be a flat iterable') 
+            raise TypeError('data must be a flat iterable')
         if not cls._is_flat_iter(peaks):
-            raise TypeError('peaks must be a flat iterable') 
+            raise TypeError('peaks must be a flat iterable')
         if not isinstance(data, numpy.ndarray):
-            data = numpy.array(data) 
-        
+            data = numpy.array(data)
+
         p = []
         for i in peaks:
             pamp = 0.9*abs(data[int(i)])
@@ -890,24 +890,24 @@ Ctrl+Alt+Right - assign
     def _f_conv(cls, parameterset_list, data):
         """
         Returns the maximum of a convolution of an initial set of lineshapes and the data to be fitted.
-        
-        parameterset_list -- a list of parameter lists: n*[[spectral offset (x), 
-                                        gauss: 2*sigma**2, 
-                                        lorentz: scale (HWHM), 
-                                        amplitude: amplitude of peak, 
+
+        parameterset_list -- a list of parameter lists: n*[[spectral offset (x),
+                                        gauss: 2*sigma**2,
+                                        lorentz: scale (HWHM),
+                                        amplitude: amplitude of peak,
                                         frac_gauss: fraction of function to be Gaussian (0 -> 1)]]
                             where n is the number of peaks
         data -- 1D spectral array
-        
+
         """
 
         if not cls._is_flat_iter(data):
-            raise TypeError('data must be a flat iterable') 
+            raise TypeError('data must be a flat iterable')
         if not cls._is_iter(parameterset_list):
-            raise TypeError('parameterset_list must be an iterable') 
+            raise TypeError('parameterset_list must be an iterable')
         if not isinstance(data, numpy.ndarray):
-            data = numpy.array(data) 
-        
+            data = numpy.array(data)
+
         data[data == 0.0] = 1e-6
         x = numpy.arange(len(data), dtype='f8')
         peaks_init = cls._f_pks(parameterset_list, x)
@@ -917,66 +917,66 @@ Ctrl+Alt+Right - assign
         max_auto_convolution = numpy.where(auto_convolution == auto_convolution.max())[0][0]
         return max_data_convolution - max_auto_convolution
 
-    @classmethod 
+    @classmethod
     def _f_pks_list(cls, parameterset_list, x):
         """
         Return a list of peak evaluations for deconvolution. See _f_pk().
-        
+
         Keyword arguments:
-        parameterset_list -- a list of parameter lists: [spectral offset (x), 
-                                        gauss: 2*sigma**2, 
-                                        lorentz: scale (HWHM), 
-                                        amplitude: amplitude of peak, 
+        parameterset_list -- a list of parameter lists: [spectral offset (x),
+                                        gauss: 2*sigma**2,
+                                        lorentz: scale (HWHM),
+                                        amplitude: amplitude of peak,
                                         frac_gauss: fraction of function to be Gaussian (0 -> 1)]
         x -- array of equal length to FID
         """
         if not cls._is_iter_of_iters(parameterset_list):
-            raise TypeError('Parameter set must be an iterable of iterables') 
+            raise TypeError('Parameter set must be an iterable of iterables')
         for p in parameterset_list:
             if not cls._is_iter(p):
-                raise TypeError('Parameter set must be an iterable') 
+                raise TypeError('Parameter set must be an iterable')
             if not all(isinstance(i, numbers.Number) for i in p):
-                raise TypeError('Keyword parameters must be numbers.') 
+                raise TypeError('Keyword parameters must be numbers.')
         if not cls._is_iter(x):
-            raise TypeError('x must be an iterable') 
+            raise TypeError('x must be an iterable')
         if not isinstance(x, numpy.ndarray):
-            x = numpy.array(x) 
+            x = numpy.array(x)
         return numpy.array([Fid._f_pk(x, *peak) for peak in parameterset_list])
-        
 
-    @classmethod 
+
+    @classmethod
     def _f_pks(cls, parameterset_list, x):
         """
         Return the sum of a series of peak evaluations for deconvolution. See _f_pk().
-        
+
         Keyword arguments:
-        parameterset_list -- a list of parameter lists: [spectral offset (x), 
-                                        gauss: 2*sigma**2, 
-                                        lorentz: scale (HWHM), 
-                                        amplitude: amplitude of peak, 
+        parameterset_list -- a list of parameter lists: [spectral offset (x),
+                                        gauss: 2*sigma**2,
+                                        lorentz: scale (HWHM),
+                                        amplitude: amplitude of peak,
                                         frac_gauss: fraction of function to be Gaussian (0 -> 1)]
         x -- array of equal length to FID
         """
-        
+
         if not cls._is_iter_of_iters(parameterset_list):
-            raise TypeError('Parameter set must be an iterable of iterables') 
+            raise TypeError('Parameter set must be an iterable of iterables')
         for p in parameterset_list:
             if not cls._is_iter(p):
-                raise TypeError('Parameter set must be an iterable') 
+                raise TypeError('Parameter set must be an iterable')
             if not all(isinstance(i, numbers.Number) for i in p):
-                raise TypeError('Keyword parameters must be numbers.') 
+                raise TypeError('Keyword parameters must be numbers.')
         if not cls._is_iter(x):
-            raise TypeError('x must be an iterable') 
+            raise TypeError('x must be an iterable')
         if not isinstance(x, numpy.ndarray):
-            x = numpy.array(x) 
-       
+            x = numpy.array(x)
+
         peaks = x*0.0
         for p in parameterset_list:
-            peak = cls._f_pk(x, 
-                    offset=p[0], 
-                    gauss_sigma=p[1], 
-                    lorentz_hwhm=p[2], 
-                    amplitude=p[3], 
+            peak = cls._f_pk(x,
+                    offset=p[0],
+                    gauss_sigma=p[1],
+                    lorentz_hwhm=p[2],
+                    amplitude=p[3],
                     frac_gauss=p[4],
                     )
             peaks += peak
@@ -986,9 +986,9 @@ Ctrl+Alt+Right - assign
     def _f_res(cls, p, data):
         """
         Objective function for deconvolution. Returns residuals of the devonvolution fit.
-        
+
         x -- array of equal length to FID
-        
+
         Keyword arguments:
         p -- lmfit parameters object:
                             offset_n -- spectral offset in x
@@ -998,15 +998,15 @@ Ctrl+Alt+Right - assign
                             frac_gauss_n -- fraction of function to be Gaussian (0 -> 1)
             where n is the peak number (zero-indexed)
         data -- spectrum array
-        
+
         """
         if not isinstance(p, lmfit.parameter.Parameters):
-            raise TypeError('Parameters must be of type lmfit.parameter.Parameters.') 
+            raise TypeError('Parameters must be of type lmfit.parameter.Parameters.')
         if not cls._is_flat_iter(data):
             raise TypeError('data must be a flat iterable.')
         if not isinstance(data, numpy.ndarray):
-            data = numpy.array(data) 
-       
+            data = numpy.array(data)
+
         params = Fid._parameters_to_list(p)
         x = numpy.arange(len(data), dtype='f8')
         res = data-cls._f_pks(params, x)
@@ -1015,44 +1015,44 @@ Ctrl+Alt+Right - assign
     @classmethod
     def _f_fitp(cls, data, peaks, frac_gauss=None, method='leastsq'):
         """Fit a section of spectral data with a combination of Gaussian/Lorentzian peaks for deconvolution.
-        
+
         Keyword arguments:
         peaks -- selected peak positions (see peakpicker())
         frac_gauss -- fraction of fitted function to be Gaussian (1 - Guassian, 0 - Lorentzian)
-   
+
         returns:
             fits -- list of fitted peak parameter sets
-            
+
         Note: peaks are fitted by default using the Levenberg-Marquardt algorithm[1]. Other fitting algorithms are available (http://cars9.uchicago.edu/software/python/lmfit/fitting.html#choosing-different-fitting-methods).
-        
+
         [1] Marquardt, Donald W. 'An algorithm for least-squares estimation of nonlinear parameters.' Journal of the Society for Industrial & Applied Mathematics 11.2 (1963): 431-441.
         """
         data = numpy.real(data)
         if not cls._is_flat_iter(data):
-            raise TypeError('data must be a flat iterable') 
+            raise TypeError('data must be a flat iterable')
         if not cls._is_flat_iter(peaks):
-            raise TypeError('peaks must be a flat iterable') 
+            raise TypeError('peaks must be a flat iterable')
         if any(peak > (len(data)-1)  for peak in peaks):
             raise ValueError('peaks must be within the length of data.')
         if not isinstance(data, numpy.ndarray):
-            data = numpy.array(data) 
+            data = numpy.array(data)
         p = cls._f_makep(data, peaks, frac_gauss=0.5)
         init_ref = cls._f_conv(p, data)
         if any(peaks+init_ref < 0) or any(peaks+init_ref > len(data)-1):
-            init_ref = 0 
+            init_ref = 0
         if frac_gauss==None:
             p = cls._f_makep(data, peaks+init_ref, frac_gauss=0.5)
         else:
             p = cls._f_makep(data, peaks+init_ref, frac_gauss=frac_gauss)
-        
+
         params = lmfit.Parameters()
         for parset in range(len(p)):
             current_parset = dict(zip(['offset', 'sigma', 'hwhm', 'amplitude', 'frac_gauss'], p[parset]))
             for k,v in current_parset.items():
                 par_name = '%s_%i'%(k, parset)
-                params.add(name=par_name, 
-                        value=v, 
-                        vary=True, 
+                params.add(name=par_name,
+                        value=v,
+                        vary=True,
                         min=0.0)
                 if 'offset' in par_name:
                     params[par_name].max = len(data)-1
@@ -1061,10 +1061,10 @@ Ctrl+Alt+Right - assign
                     if frac_gauss is not None:
                         params[par_name].vary = False
                 #if 'sigma' in par_name or 'hwhm' in par_name:
-                #    params[par_name].max = 0.01*current_parset['amplitude'] 
+                #    params[par_name].max = 0.01*current_parset['amplitude']
                 if 'amplitude' in par_name:
                     params[par_name].max = 2.0*data.max()
-                    
+
         try:
             mz = lmfit.minimize(cls._f_res, params, args=([data]), method=method)
             fits = Fid._parameters_to_list(mz.params)
@@ -1093,13 +1093,13 @@ Ctrl+Alt+Right - assign
         datum, peaks, ranges, frac_gauss, method = list_parameters
 
         if not cls._is_iter_of_iters(ranges):
-            raise TypeError('ranges must be an iterable of iterables') 
+            raise TypeError('ranges must be an iterable of iterables')
         if not all(len(rng) == 2 for rng in ranges):
             raise ValueError('ranges must contain two values.')
         if not all(rng[0] != rng[1] for rng in ranges):
             raise ValueError('data_index must contain different values.')
         if not isinstance(datum, numpy.ndarray):
-            datum = numpy.array(datum) 
+            datum = numpy.array(datum)
         if datum.dtype in cls._complex_dtypes:
             raise TypeError('data must be not be complex.')
 
@@ -1126,17 +1126,17 @@ Ctrl+Alt+Right - assign
         :keyword frac_gauss: (0-1) determines the Gaussian fraction of the peaks. Setting this argument to None will fit this parameter as well.
 
         :keyword method: The fitting method to use. Default is 'leastsq', the Levenberg-Marquardt algorithm, which is usually sufficient. Additional options include:
-            
+
             Nelder-Mead (nelder)
-        
+
             L-BFGS-B (l-bfgs-b)
-        
+
             Conjugate Gradient (cg)
-        
+
             Powell (powell)
-        
+
             Newton-CG  (newton)
-        
+
         """
 
         if not len(self.data):
@@ -1161,7 +1161,7 @@ Ctrl+Alt+Right - assign
 
         :keyword lower_ppm: lower spectral bound in ppm
 
-        :keyword lw: linewidth of plot 
+        :keyword lw: linewidth of plot
 
         :keyword colour: colour of the plot
         """
@@ -1178,7 +1178,7 @@ Ctrl+Alt+Right - assign
 
         :keyword lower_ppm: lower spectral bound in ppm
 
-        :keyword lw: linewidth of plot 
+        :keyword lw: linewidth of plot
 
         :keyword colour: colour of the plot
 
@@ -1192,7 +1192,7 @@ Ctrl+Alt+Right - assign
         plt._plot_deconv(self, **kwargs)
         setattr(self, plt.id, plt)
         pyplot.show()
- 
+
 class FidArray(Base):
     '''
 
@@ -1348,7 +1348,7 @@ class FidArray(Base):
     def add_fids(self, fids):
         """
         Add a list of :class:`~nmrpy.data_objects.Fid` objects to this :class:`~nmrpy.data_objects.FidArray`.
-        
+
         :arg fids: a list of :class:`~nmrpy.data_objects.Fid` instances
         """
         if FidArray._is_iter(fids):
@@ -1367,8 +1367,8 @@ class FidArray(Base):
     def from_data(cls, data):
         """
         Instantiate a new :class:`~nmrpy.data_objects.FidArray` object from a 2D data set of spectral arrays.
-        
-        :arg data: a 2D data array 
+
+        :arg data: a 2D data array
         """
         if not cls._is_iter_of_iters(data):
             raise TypeError('data must be an iterable of iterables.')
@@ -1389,9 +1389,9 @@ class FidArray(Base):
         :keyword fid_path: filepath to .fid directory
 
         :keyword file_format: 'varian' or 'bruker', usually unnecessary
-        
-        :keyword arrayset: (int) array set for interleaved spectra, 
-                                 user is prompted if not specified 
+
+        :keyword arrayset: (int) array set for interleaved spectra,
+                                 user is prompted if not specified
         """
         if not file_format:
             try:
@@ -1410,7 +1410,7 @@ class FidArray(Base):
         elif file_format == 'nmrpy':
             with open(fid_path, 'rb') as f:
                 return pickle.load(f)
-       
+
         if cls._is_iter(importer.data):
             fid_array = cls.from_data(importer.data)
             fid_array._file_format = importer._file_format
@@ -1420,19 +1420,19 @@ class FidArray(Base):
                 fid._file_format = fid_array._file_format
                 fid.fid_path = fid_array.fid_path
                 fid._procpar = fid_array._procpar
-            return fid_array 
+            return fid_array
         else:
             raise IOError('Data could not be imported.')
 
     def zf_fids(self):
-        """ 
+        """
         Zero-fill all :class:`~nmrpy.data_objects.Fid` objects owned by this :class:`~nmrpy.data_objects.FidArray`
         """
         for fid in self.get_fids():
             fid.zf()
 
     def emhz_fids(self, lb=5.0):
-        """ 
+        """
         Apply line-broadening (apodisation) to all :class:`nmrpy.~data_objects.Fid` objects owned by this :class:`~nmrpy.data_objects.FidArray`
 
         :keyword lb: degree of line-broadening in Hz.
@@ -1441,7 +1441,7 @@ class FidArray(Base):
             fid.emhz(lb=lb)
 
     def ft_fids(self, mp=True, cpus=None):
-        """ 
+        """
         Fourier-transform all FIDs.
 
         :keyword mp: parallelise over multiple processors, significantly reducing computation time
@@ -1455,13 +1455,13 @@ class FidArray(Base):
             for fid, datum in zip(fids, ft_data):
                 fid.data = datum
                 fid._flags['ft'] = True
-        else: 
+        else:
             for fid in self.get_fids():
                 fid.ft()
         print('Fourier-transformation completed')
 
     def real_fids(self):
-        """ 
+        """
         Discard imaginary component of FID data sets.
 
         """
@@ -1469,7 +1469,7 @@ class FidArray(Base):
             fid.real()
 
     def norm_fids(self):
-        """ 
+        """
         Normalise FIDs by maximum data value in :attr:`~nmrpy.data_objects.FidArray.data`.
 
         """
@@ -1478,7 +1478,7 @@ class FidArray(Base):
             fid.data = fid.data/dmax
 
     def phase_correct_fids(self, method='leastsq', mp=True, cpus=None):
-        """ 
+        """
         Apply automatic phase-correction to all :class:`~nmrpy.data_objects.Fid` objects owned by this :class:`~nmrpy.data_objects.FidArray`
 
         :keyword method: see :meth:`~nmrpy.data_objects.Fid.phase_correct`
@@ -1487,7 +1487,7 @@ class FidArray(Base):
 
         :keyword cpus: defines number of CPUs to utilise if 'mp' is set to True
         """
-        if mp: 
+        if mp:
             fids = self.get_fids()
             if not all(fid.data.dtype in self._complex_dtypes for fid in fids):
                 raise TypeError('Only complex data can be phase-corrected.')
@@ -1520,9 +1520,9 @@ Ctrl+Alt+Right - assign
 '''
         plot_title = 'Select data for baseline-correction'
         self._baseliner_widget = FidArrayRangeSelector(self, title=plot_title, label=plot_label, voff=0.01)
-  
+
     def baseline_correct_fids(self, deg=2):
-        """ 
+        """
         Apply baseline-correction to all :class:`~nmrpy.data_objects.Fid` objects owned by this :class:`~nmrpy.data_objects.FidArray`
 
         :keyword deg: degree of the baseline polynomial (see :meth:`~nmrpy.data_objects.Fid.baseline_correct`)
@@ -1540,7 +1540,7 @@ Ctrl+Alt+Right - assign
 
     @_data_traces.setter
     def _data_traces(self, data_traces):
-        self.__data_traces = data_traces 
+        self.__data_traces = data_traces
 
     @property
     def _index_traces(self):
@@ -1548,7 +1548,7 @@ Ctrl+Alt+Right - assign
 
     @_index_traces.setter
     def _index_traces(self, index_traces):
-        self.__index_traces = index_traces 
+        self.__index_traces = index_traces
 
     @property
     def _trace_mask(self):
@@ -1556,7 +1556,7 @@ Ctrl+Alt+Right - assign
 
     @_trace_mask.setter
     def _trace_mask(self, trace_mask):
-        self.__trace_mask = trace_mask 
+        self.__trace_mask = trace_mask
 
     @property
     def _trace_mean_ppm(self):
@@ -1564,8 +1564,8 @@ Ctrl+Alt+Right - assign
 
     @_trace_mean_ppm.setter
     def _trace_mean_ppm(self, trace_mean_ppm):
-        trace_mean_ppm 
-        self.__trace_mean_ppm = trace_mean_ppm 
+        trace_mean_ppm
+        self.__trace_mean_ppm = trace_mean_ppm
 
     @property
     def integral_traces(self):
@@ -1577,10 +1577,10 @@ Ctrl+Alt+Right - assign
 
     @integral_traces.setter
     def integral_traces(self, integral_traces):
-        self._integral_traces = integral_traces 
+        self._integral_traces = integral_traces
 
     def deconv_fids(self, mp=True, cpus=None, method='leastsq', frac_gauss=0.0):
-        """ 
+        """
         Apply deconvolution to all :class:`~nmrpy.data_objects.Fid` objects owned by this :class:`~nmrpy.data_objects.FidArray`, using the :attr:`~nmrpy.data_objects.Fid.peaks` and  :attr:`~nmrpy.data_objects.Fid.ranges` attribute of each respective :class:`~nmrpy.data_objects.Fid`.
 
         :keyword method: see :meth:`~nmrpy.data_objects.Fid.phase_correct`
@@ -1589,7 +1589,7 @@ Ctrl+Alt+Right - assign
 
         :keyword cpus: defines number of CPUs to utilise if 'mp' is set to True, default is n-1 cores
         """
-        if mp: 
+        if mp:
             fids = self.get_fids()
             if not all(fid._flags['ft'] for fid in fids):
                 raise ValueError('Only Fourier-transformed data can be deconvoluted.')
@@ -1629,7 +1629,7 @@ Ctrl+Alt+Right - assign
         :keyword p1: First order phase in degrees
         """
         for fid in self.get_fids():
-            fid.ps(p0=p0, p1=p1)  
+            fid.ps(p0=p0, p1=p1)
 
     @staticmethod
     def _generic_mp(fcn, iterable, cpus):
@@ -1709,22 +1709,22 @@ Ctrl+Alt+Right - assign
 
         """
         plt = Plot()
-        plt._plot_deconv_array(self.get_fids(), 
+        plt._plot_deconv_array(self.get_fids(),
             **kwargs)
         setattr(self, plt.id, plt)
-        
+
 
     def calibrate(self, fid_number=None, assign_only_to_index=False,
                   voff=0.02):
         """
-        Instantiate a GUI widget to select a peak and calibrate 
-        spectra in a :class:`~nmrpy.data_objects.FidArray`. 
-        Left-clicking selects a peak. The user is then prompted to enter 
+        Instantiate a GUI widget to select a peak and calibrate
+        spectra in a :class:`~nmrpy.data_objects.FidArray`.
+        Left-clicking selects a peak. The user is then prompted to enter
         the PPM value of that peak for calibration; this will be applied
         to all :class:`~nmrpy.data_objects.Fid`
         objects owned by this :class:`~nmrpy.data_objects.FidArray`. See
         also :meth:`~nmrpy.data_objects.Fid.calibrate`.
-        
+
         :keyword fid_number: list or number, index of :class:`~nmrpy.data_objects.Fid` to use for calibration. If None, the whole data array is plotted.
 
         :keyword assign_only_to_index: if True, assigns calibration only to :class:`~nmrpy.data_objects.Fid` objects indexed by fid_number; if False, assigns to all.
@@ -1738,14 +1738,14 @@ Left - select peak
         self._calibrate_widget = RangeCalibrator(self,
                             y_indices=fid_number,
                             aoti=assign_only_to_index,
-                            voff=voff, 
+                            voff=voff,
                             label=plot_label,
                             )
 
     def peakpicker(self, fid_number=None, assign_only_to_index=True, voff=0.02):
         """
 
-        Instantiate peak-picker widget for 
+        Instantiate peak-picker widget for
         :attr:`~nmrpy.data_objects.Fid.data`, and apply selected
         :attr:`~nmrpy.data_objects.Fid.peaks` and
         :attr:`~nmrpy.data_objects.Fid.ranges` to all :class:`~nmrpy.data_objects.Fid`
@@ -1770,11 +1770,11 @@ Ctrl+Alt+Right - assign
         self._peakpicker_widget = DataPeakRangeSelector(self,
                 y_indices=fid_number,
                 aoti=assign_only_to_index,
-                voff=voff, 
+                voff=voff,
                 label=plot_label)
 
-    def peakpicker_traces(self, 
-            voff=0.02, 
+    def peakpicker_traces(self,
+            voff=0.02,
             lw=1):
         """
         Instantiates a widget to pick peaks and ranges employing a polygon
@@ -1824,7 +1824,7 @@ Ctrl+Alt+Right - assign
         ppm = [numpy.round(numpy.mean(i[0]), 2) for i in traces]
         self._trace_mean_ppm = ppm
         tt = [i[1] for i in traces]
-        ln = len(self.data) 
+        ln = len(self.data)
         filled_tt = []
         for i in tt:
             rng = numpy.arange(ln)
@@ -1834,7 +1834,7 @@ Ctrl+Alt+Right - assign
         filled_tt = numpy.array(filled_tt)
         return filled_tt
 
-    def _set_all_peaks_ranges_from_traces_and_spans(self, traces, spans): 
+    def _set_all_peaks_ranges_from_traces_and_spans(self, traces, spans):
         traces = [dict(zip(i[1], i[0])) for i in traces]
         fids = self.get_fids()
         fids_i = range(len(self.data))
@@ -1846,15 +1846,15 @@ Ctrl+Alt+Right - assign
                     for rng in spans:
                         if peak >= min(rng) and peak <= max(rng):
                             peaks.append(peak)
-            fids[i].peaks = peaks 
+            fids[i].peaks = peaks
             ranges = []
-            for rng in spans: 
+            for rng in spans:
                 if any((peaks>min(rng))*(peaks<max(rng))):
                     ranges.append(rng)
             if ranges == []:
                 ranges = None
-            fids[i].ranges = ranges 
-          
+            fids[i].ranges = ranges
+
 
     def _get_all_summed_peakshapes(self):
         """
@@ -1923,9 +1923,9 @@ Ctrl+Left - delete nearest trace
 Ctrl+Alt+Right - assign
 '''
         self._select_trace_widget = DataTraceSelector(self,
-            extra_data=peakshapes, 
-            extra_data_colour='b', 
-            voff=voff, 
+            extra_data=peakshapes,
+            extra_data_colour='b',
+            voff=voff,
             label=plot_label,
             lw=lw)
 
@@ -1941,7 +1941,7 @@ Ctrl+Alt+Right - assign
         if not hasattr(self, '_integral_traces'):
             raise AttributeError('No integral traces. First run select_integral_traces().')
         integrals_set = {}
-        decon_set = self.deconvoluted_integrals 
+        decon_set = self.deconvoluted_integrals
         for i, tr in self.integral_traces.items():
             tr_keys = numpy.array([fid for fid in tr.keys()])
             tr_vals = numpy.array([val for val in tr.values()])
@@ -1949,7 +1949,7 @@ Ctrl+Alt+Right - assign
             tr_keys = tr_keys[tr_sort]
             tr_vals = tr_vals[tr_sort]
             integrals = decon_set[tr_keys, tr_vals]
-            integrals_set[i] = integrals    
+            integrals_set[i] = integrals
         return integrals_set
 
     def save_to_file(self, filename=None, overwrite=False):
@@ -1981,7 +1981,7 @@ Ctrl+Alt+Right - assign
             fid._del_widgets()
         with open(filename, 'wb') as f:
             pickle.dump(self, f)
-  
+
 class Importer(Base):
 
     def __init__(self, *args, **kwargs):
@@ -2021,15 +2021,15 @@ class Importer(Base):
             return
         except (FileNotFoundError, OSError):
             print('fid_path does not specify a valid .fid directory.')
-            return 
+            return
         except (TypeError, IndexError):
             print('probably not Bruker data')
-        try: 
+        try:
             print('Attempting Varian')
             varianimporter = VarianImporter(fid_path=self.fid_path)
             varianimporter.import_fid()
             self._procpar = varianimporter._procpar
-            self.data = varianimporter.data 
+            self.data = varianimporter.data
             self._file_format = varianimporter._file_format
             return
         except TypeError:
@@ -2040,20 +2040,19 @@ class VarianImporter(Importer):
     def import_fid(self):
         try:
             procpar, data = nmrglue.varian.read(self.fid_path)
-            self.data = data 
+            self.data = data
             self._procpar = procpar
             self._file_format = 'varian'
         except FileNotFoundError:
             print('fid_path does not specify a valid .fid directory.')
         except OSError:
             print('fid_path does not specify a valid .fid directory.')
-        
+
 class BrukerImporter(Importer):
 
     def import_fid(self, arrayset=None):
         try:
-            dirs = [int(i) for i in os.listdir(self.fid_path) if \
-                    os.path.isdir(self.fid_path+os.path.sep+i)]
+            dirs = [int(x) for x in detect_spectra()]
             dirs.sort()
             dirs = [str(i) for i in dirs]
             alldata = []
@@ -2061,28 +2060,10 @@ class BrukerImporter(Importer):
                 procpar, data = nmrglue.bruker.read(self.fid_path+os.path.sep+d)
                 alldata.append((procpar, data))
             self.alldata = alldata
-            incr = 1
-            while True:
-                if len(alldata) == 1:
-                    break
-                if alldata[incr][1].shape == alldata[0][1].shape:
-                    break
-                incr += 1
-            if incr > 1:
-                if arrayset == None:
-                    print('Total of '+str(incr)+' alternating FidArrays found.')
-                    arrayset = input('Which one to import? ')
-                    arrayset = int(arrayset)
-                else:
-                    arrayset = arrayset
-                if arrayset < 1 or arrayset > incr:
-                    raise ValueError('Select a value between 1 and '
-                                      + str(incr) + '.')
-            else:
-                arrayset = 1
-            self.incr = incr
-            procpar = alldata[arrayset-1][0]
-            data = numpy.vstack([d[1] for d in alldata[(arrayset-1)::incr]])
+            self.incr = 1
+            arrayset = 1
+            procpar = alldata[0][0]
+            data = numpy.vstack([d[1] for d in alldata])
             self.data = data
             self._procpar = procpar
             self._file_format = 'bruker'
@@ -2095,7 +2076,7 @@ class BrukerImporter(Importer):
             print('fid_path does not specify a valid .fid directory.')
         except OSError:
             print('fid_path does not specify a valid .fid directory.')
-            
+
     def _get_time_delta(self):
         td = 0.0
         tcum = []
@@ -2111,6 +2092,22 @@ class BrukerImporter(Importer):
             tcum.append(td)
             tsingle.append(tot)
         return (td, numpy.array(tcum), numpy.array(tsingle))
+
+    def detect_spectra(self, isotope='13C', init=11):
+        """Returns a list of spectra IDs for the given isotope."""
+        iso_spectra = []
+        dirs = glob.iglob(os.path.join(self.fid_path, '/*/'))
+        st = [str(y) for y in sorted([int(os.path.basename(x[:-1])) for x in dirs])]
+        for i, fn in enumerate(st):
+            if int(fn) >= int(init):
+                try:
+                    dic, data = nmrglue.bruker.read(dirs[i])
+                    udic = nmrglue.bruker.guess_udic(dic, data)
+                    if udic[0]['label'] == isotope and udic[0]['encoding'] == 'direct':
+                        iso_spectra.append(fn)
+                except OSError:
+                    pass
+        return iso_spectra
 
 if __name__ == '__main__':
     pass
